@@ -1,7 +1,7 @@
 streamlit
-llama-index==0.12.16
-ollama==0.4.7
-pydantic~=2.10.6
+llama-index
+ollama
+pydantic
 llama-index-embeddings-ollama
 llama-index-llms-ollama
 chromadb
