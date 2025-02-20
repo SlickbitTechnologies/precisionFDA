@@ -24,7 +24,8 @@ def get_index_store(embed_model):
     # vector_store = storage_context.vector_store
     # logger.info(f"STORAGE CONTEXT {vs}")
     vector_index = load_index_from_storage(
-        storage_context
+        storage_context,
+        embed_model=embed_model
     )
 
 
