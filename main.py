@@ -56,7 +56,7 @@ llm = get_local_model()
 # Create a query engine with the local Llama model
 memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
 
-query_engine = get_flare_query_engine()
+query_engine = get_query_engine()
 
 chat_engine = vector_index.as_chat_engine(
     chat_mode="condense_plus_context",
