@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class OllamaSettings(BaseModel):
     llm:str = Field(
-        default="deepseek-r1", description="LLM model"
+        default="llama3.2:1b", description="LLM model"
     )
     port:int = Field(
         default=11434,description="Ollama port"
