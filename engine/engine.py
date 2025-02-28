@@ -72,30 +72,8 @@ def get_retriever():
         )
         return hybrid_retriever
     except Exception as e:
-        print(e)
         return None
 
-
-def get_chat_engine():
-    try:
-        return CondensePlusContextChatEngine.from_defaults(
-            retriever=get_retriever(),
-            llm=get_local_model(),
-            memory=ChatMemoryBuffer(
-                token_limit=3029
-            )
-        )
-    except Exception as e:
-        print(e)
-        return None
-
-COMPACT_ACCUMULATE = "compact_accumulate"\
-    """
-    Compact and accumulate mode first combine text chunks into larger consolidated \
-    chunks that more fully utilize the available context window, then accumulate \
-    answers for each of them and finally return the concatenation.
-    This mode is faster than accumulate since we make fewer calls to the LLM.
-    """
 def get_query_engine() -> RetrieverQueryEngine:
     query_engine = RetrieverQueryEngine.from_args(
         retriever=vector_index.as_retriever(
@@ -123,16 +101,5 @@ def get_query_engine() -> RetrieverQueryEngine:
 
         )
     )
-    print(f"Yor are using {ResponseMode.REFINE}")
     return query_engine
 
-def get_flare_query_engine():
-    index_query_engine = vector_index.as_query_engine(similarity_top_k=2,llm=llm)
-    query_engine = FLAREInstructQueryEngine(
-        query_engine=index_query_engine,
-        max_iterations=4,
-        llm=llm,
-        verbose=True,
-        instruct_prompt=instruct_prompt
-    )
-    return query_engine
