@@ -82,13 +82,18 @@ if user_query:
         try:
             # Process the query using the local Llama model
             st.session_state.messages.append({"role": 'user', "content": user_query})
-            response = query_engine.query(user_query)
-            # docs = query_engine.retrieve(user_query)
-            # for doc in docs:
-            #     print(doc.get_content(),doc.get_score())
+            response = query_engine.query(user_query.strip())
+            answer = response.response
+            if len(answer) > 100:
+                answer = answer.replace("Hello, I'm Precision FDA.", "").strip()
+                answer = answer.replace("Hello, how can I help you?","").strip()
+                answer = answer.replace("how can I help you?","").strip()
+            docs = query_engine.retrieve(user_query)
+            for doc in docs:
+                print(doc.get_score())
 
             # Display the response
-            st.session_state.messages.append({"role": 'assistant', "content": response.response})
+            st.session_state.messages.append({"role": 'assistant', "content": answer})
             # st.write(response.response)  # Assuming `response.response` contains the answer text
         except Exception as e:
             print(e)

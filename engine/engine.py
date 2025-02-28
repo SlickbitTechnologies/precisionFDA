@@ -52,10 +52,10 @@ settings = RAGSettings()
 
 def get_retriever():
     try:
-        vector_index = get_or_create_vector_index()
+        # vector_index = get_or_create_vector_index()
         vector_retriever = VectorIndexRetriever(
             index=vector_index,
-            similarity_top_k=5,
+            similarity_top_k=10,
             embed_model=get_embedding_model(),
             verbose=True
         )
@@ -89,26 +89,41 @@ def get_chat_engine():
         print(e)
         return None
 
-
+COMPACT_ACCUMULATE = "compact_accumulate"\
+    """
+    Compact and accumulate mode first combine text chunks into larger consolidated \
+    chunks that more fully utilize the available context window, then accumulate \
+    answers for each of them and finally return the concatenation.
+    This mode is faster than accumulate since we make fewer calls to the LLM.
+    """
 def get_query_engine() -> RetrieverQueryEngine:
     query_engine = RetrieverQueryEngine.from_args(
-        retriever=vector_index.as_retriever(llm=llm),
+        retriever=vector_index.as_retriever(
+            llm=llm,
+            similarity_threshold=0.7
+        ),
         llm=llm,
-        response_mode=ResponseMode.GENERATION,
+        response_mode=ResponseMode.REFINE,
         memory=memory,
         context_prompt=(
-            "You are Precision FDA, a helpful chatbot. "
+            "You are FDA Advisory Committee, a helpful chatbot. "
             "Respond based on the retrieved context and chat history.\n\n"
             "1. If the user greets (e.g., 'Hi', 'Hello', 'Hey'), respond with:\n"
-            "   'Hello, I'm Precision FDA. How can I help you?'\n\n"
+            "   'Hello, how can I help you?'\n\n"
             "2. If the user asks a question and relevant information is found in the documents, provide an accurate response.\n\n"
             "3. If no relevant information is found, respond with:\n"
             "   'Please, ask relative questions.'\n\n"
             "Here are the relevant documents for context:\n"
             "{context_str}\n"
-            "Use the previous chat history and the context above to interact and help the user."
-        ),
+            "Response must detailed and elaborated manner"
+            "Important Instructions:\n"
+            "- Do not start responses with 'How can I help you?'\n"
+            "- Do not end responses with 'Please, ask relative questions if you'd like more information.'\n"
+            "- Keep answers precise and relevant without unnecessary introductions or conclusions."
+
+        )
     )
+    print(f"Yor are using {ResponseMode.REFINE}")
     return query_engine
 
 def get_flare_query_engine():
